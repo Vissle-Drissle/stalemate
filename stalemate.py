@@ -4,6 +4,9 @@ import socket
 import requests
 import concurrent.futures
 
+""" An attempt to prevent spam detection """
+header = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36"
+
 """ Load the `accounts.txt` file """
 try:
   accounts = []
@@ -19,7 +22,7 @@ def token(target):
     """ Separate the login data provided by a colon then log in to Chatango to retrieve the account token """
     accounts.remove(target)
     query = target.split(": ", 1)
-    post = requests.post("https://chatango.com/login", data={"user_id": query[0], "password": query[1], "storecookie": "on", "checkerrors": "yes"}).cookies.get("auth.chatango.com", False)
+    post = requests.post("https://chatango.com/login", data={"user_id": query[0], "password": query[1], "storecookie": "on", "checkerrors": "yes"}, headers={"User-Agent": header}).cookies.get("auth.chatango.com", False)
     if post: return [query[0], post]
     else:
       incorrect.append(query[0])
