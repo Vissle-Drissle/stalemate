@@ -8,7 +8,9 @@ import websockets
 try:
   accounts = []
   with open("accounts.txt", "r") as file:
-    for x in file.readlines(): accounts.append(x)
+    for x in file.readlines():
+      password = x.strip()
+      accounts.append(password)
 except Exception as error: accounts = []
 
 detail = []
