@@ -1,58 +1,76 @@
 import time
-import random
-import socket
-import requests
-import concurrent.futures
+import asyncio
+import websockets
 
-""" An attempt to prevent spam detection """
-header = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36"
+# stalemate.py v2.0 by Vissle Drissle
 
 """ Load the `accounts.txt` file """
 try:
   accounts = []
   with open("accounts.txt", "r") as file:
-    for x in file.readlines():
-      password = x.strip()
-      accounts.append(password)
+    for x in file.readlines(): accounts.append(x)
 except Exception as error: accounts = []
 
-incorrect, maximum = [], len(accounts)
+detail = []
 
-def token(target):
-    """ Separate the login data provided by a colon then log in to Chatango to retrieve the account token """
-    accounts.remove(target)
-    query = target.split(": ", 1)
-    post = requests.post("https://chatango.com/login", data={"user_id": query[0], "password": query[1], "storecookie": "on", "checkerrors": "yes"}, headers={"User-Agent": header}).cookies.get("auth.chatango.com", False)
-    if post: return [query[0], post]
+""" Log in to Chatango with the message catcher server and then immediately log out """
+async def login(username, password):
+  try:
+    async with websockets.connect("wss://i0.chatango.com:8081/", origin="https://st.chatango.com", ping_interval=None, ping_timeout=None) as client:
+      connected = True
+      await client.send("version:4:1\r\n\x00")
+      await client.send(f"login:{username}:{password}\r\n\x00")
+      while connected:
+        try:
+          frame = await client.recv()
+          clean = frame.replace("\r\n\x00", "")
+          if "msgcount" in clean:
+            unread = clean.split(":")[1]
+            await client.close()
+            return [True, username, unread]
+          elif "DENIED" in clean:
+            await client.close()
+            return [False, username, False]
+        except Exception as error:
+          connected = False
+          await client.close()
+          return [False, username, False]
+  except: return [False, username, False]
+
+""" Show results of logins """
+async def launch():
+  result = await asyncio.gather(*detail)
+  fail = []
+  total = []
+  for x in result:
+    if x[0]: total.append(f"{x[1]}: {x[2]} unread messages")
     else:
-      incorrect.append(query[0])
-      return [query[0], False]
+      fail.append(x[1])
+      total.append(f"{x[1]}: ")
+  parse = "\n".join(total)
+  print(f"Finished in {int(time.time() - run)} seconds.")
+  if fail:
+    with open("accounts.txt", "w") as file: file.write(parse)
+    content = input(f'Logged ({len(accounts) - len(fail)}/{len(accounts)}) accounts, check "log.txt" for more details.\nType "clean" to only show accounts that failed to log in. (Close "log.txt" if open before typing)')
+    if content == "clean":
+      failed = "\n".join(fail)
+      with open("accounts.txt", "w") as file: file.write(failed)
+    else: input()
+  else:
+    with open("accounts.txt", "w") as file: file.write(parse)
+    input('All accounts were logged, check "log.txt" to see the amount of unread messages for each account.')
 
-def connect(target):
-    """ Log in to Chatango private messages with the token and then immediately log out """
-    query = token(target)
-    if query[1]:
-      frame = bytes(f"tlogin:{query[1]}:2:{random.randint(1, 10 ** 16)}\x00", "utf-8")
-      log = socket.socket()
-      log.connect(("c1.chatango.com", 5222))
-      log.send(frame)
-      log.close()
-      return f'[LOGIN] {query[0]}'
-    else: return f'[INCORRECT] {query[0]}'
+""" Login data separated by a colon (username: password) """
+if len(accounts) > 0:
+  for x in accounts:
+    data = x.split(": ")
+    username = data[0]
+    password = data[1]
+    function = login(username, password)
+    detail.append(function)
 
-def process():
-    """ Do the `connect(target)` function 100 times simultaneously, may or may not be CPU intensive """
-    data = 100
-    if len(accounts) < data: data = len(accounts)
-    with concurrent.futures.ThreadPoolExecutor(max_workers=data) as action:
-      for x in action.map(connect, accounts[0:data]): print(x)
-
-print("Launching...")
-run = time.time()
-
-""" While the amount of accounts in `accounts.txt` is above 0, do the `process()` function """
-while len(accounts) > 0:
-  process()
-  print(f'[STATUS] ({maximum - len(accounts)}/{maximum}) completed in {int(time.time() - run)} seconds')
-
-input(f'[FINISH] {"Failed to login to " + ", ".join(incorrect) if incorrect else ""}')
+  print("Launching...")
+  run = time.time()
+  script = launch()
+  asyncio.run(script)
+else: print('"accounts.txt" is empty.')
