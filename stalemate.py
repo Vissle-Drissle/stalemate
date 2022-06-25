@@ -51,14 +51,14 @@ async def launch():
   print(f"Finished in {int(time.time() - run)} seconds.")
   if fail:
     with open("accounts.txt", "w") as file: file.write(parse)
-    content = input(f'Logged ({len(accounts) - len(fail)}/{len(accounts)}) accounts, check "log.txt" for more details.\nType "clean" to only show accounts that failed to log in. (Close "log.txt" if open before typing)')
+    content = input(f'Logged ({len(accounts) - len(fail)}/{len(accounts)}) accounts, check "accounts.txt" for more details.\nType "clean" to only show accounts that failed to log in. (Close "accounts.txt" if open before typing)')
     if content == "clean":
       failed = "\n".join(fail)
       with open("accounts.txt", "w") as file: file.write(failed)
     else: input()
   else:
     with open("accounts.txt", "w") as file: file.write(parse)
-    input('All accounts were logged, check "log.txt" to see the amount of unread messages for each account.')
+    input('All accounts were logged, check "accounts.txt" to see the amount of unread messages for each account.')
 
 """ Login data separated by a colon (username: password) """
 if len(accounts) > 0:
