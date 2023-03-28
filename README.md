@@ -3,13 +3,17 @@ Stalemate is a script for Chatango that logs in to your accounts to prevent them
 
 ## Usage
 
-- Install the latest version of [Python](https://www.python.org/)
-- While installing Python, make sure "pip" is ticked in the `Optional Features`
+- Install [Python 3.8.0](https://www.python.org/downloads/release/python-380/) - "Windows x86-64 executable installer"
+- Select to customize your installation.
+- Make sure "pip" is ticked in the `Optional Features`
+  Make sure "Add Python to environment variables" is ticked in `Advanced Options`
 - Open command prompt and type `pip install websockets`, if command is not recognized try restarting your computer
-- Download the ZIP folder
-- Unzip the folder when finished downloading
-- Edit `accounts.txt` with the account details you want to log using the example format
+- Click "<> Code" and download ZIP
+  Unzip the folder when finished downloading
+  Edit `accounts.txt` with the account details you want to log using the example format
 - Double left click on `stalemate.py` to run the script
+- If it immediately closes, right click `stalemate.py` and "Edit with IDLE"
+  At the top, click "Run" and "Run module" and you may see errors.
 
 ## Optional
 Since you would be inputting passwords in a text file, here are suggestions to keep those passwords safe
