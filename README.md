@@ -5,8 +5,8 @@ Stalemate is a script for Chatango that logs in to your accounts to prevent them
 
 - Install [Python 3.8.0](https://www.python.org/downloads/release/python-380/) - "Windows x86-64 executable installer"
 - Select to customize your installation.
-- Make sure "pip" is ticked in the `Optional Features`
-  Make sure "Add Python to environment variables" is ticked in `Advanced Options`
+- Make sure "pip" is ticked in the `Optional Features` menu
+  Make sure "Add Python to environment variables" is ticked in `Advanced Options` menu
 - Open command prompt and type `pip install websockets`, if command is not recognized try restarting your computer
 - Click "<> Code" and download ZIP
   Unzip the folder when finished downloading
