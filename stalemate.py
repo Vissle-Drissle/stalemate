@@ -2,7 +2,7 @@ import time
 import asyncio
 import websockets
 
-# stalemate.py v3.0 by Vissle Drissle
+# stalemate.py v3.1 by Vissle Drissle
 
 """ Load the `accounts.txt` file """
 try:
@@ -79,10 +79,10 @@ if len(accounts) > 0:
       break
 
   if fail:
-    print(f'Incorrect format was used, please check the line below in accounts.txt\n{fail}\nThe format is "username: password"')
+    input(f'Incorrect format was used, please check the line below in accounts.txt\n{fail}\nThe format is "username: password"')
   else:
     print("Launching...")
     run = time.time()
     script = launch()
     asyncio.run(script)
-else: print('"accounts.txt" is empty.')
+else: input('"accounts.txt" is empty.')
